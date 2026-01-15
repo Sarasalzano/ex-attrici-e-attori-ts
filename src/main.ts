@@ -72,7 +72,7 @@ function isActress(data: unknown): data is Actress {
     //controlla se most famous movies è un array
     Array.isArray(data.most_famous_movies) &&
     data.most_famous_movies.length === 3 &&
-    data.most_famous_movies.every(a => typeof a === "string") &&
+    data.most_famous_movies.every((a) => typeof a === "string") &&
     "awards" in data &&
     typeof data.awards === "string" &&
     "nationality" in data &&
@@ -98,11 +98,41 @@ async function getActress(id: number): Promise<Actress | null> {
     }
     //error è unknown quindi faccio un check
   } catch (error) {
-    if(error instanceof Error){
-      console.log("Errore recupero attrice")
+    if (error instanceof Error) {
+      console.log("Errore recupero attrice");
     } else {
-    console.error(error);
-    return null;
+      console.error(error);
+      return null;
+    }
+  }
+}
+
+// Milestone 4
+// Crea una funzione getAllActresses che chiama:
+
+// GET /actresses
+// La funzione deve restituire un array di oggetti Actress.
+
+// Può essere anche un array vuoto.
+
+async function getAllActresses(): Promise<Actress[]> {
+  try {
+    const response = await fetch(`http://localhost:3333/actresses`);
+    if (!response.ok) {
+      throw new Error("Errore fetch");
+    } else {
+      const data: unknown = await response.json();
+      if (!(data instanceof Array)) {
+        throw new Error("Formato dei dati non valido");
+      } else {
+        const attrici: Actress[] = data.filter((attrice) => isActress(attrice));
+        return attrici;
+      }
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("Errore recupero attrici");
+      return [];
     }
   }
 }
